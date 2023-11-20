@@ -93,13 +93,13 @@ public class FormKehadiran extends javax.swing.JFrame {
         btn_perbarui = new javax.swing.JButton();
         btn_batal = new javax.swing.JButton();
         btn_hapus = new javax.swing.JButton();
-        jTextField1 = new javax.swing.JTextField();
+        t_cari = new javax.swing.JTextField();
         t_jam = new javax.swing.JTextField();
 
         jRadioButtonMenuItem1.setSelected(true);
         jRadioButtonMenuItem1.setText("jRadioButtonMenuItem1");
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 18)); // NOI18N
         jLabel1.setText("DATA KEHADIRAN MAHASISWA");
@@ -134,6 +134,11 @@ public class FormKehadiran extends javax.swing.JFrame {
                 "Id", "Id Mahasiswa", "Id Ruang", "Tanggal", "Jam", "Status"
             }
         ));
+        tbl_data.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tbl_dataMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tbl_data);
 
         jLabel5.setText("Jam                  :");
@@ -150,12 +155,37 @@ public class FormKehadiran extends javax.swing.JFrame {
         });
 
         btn_perbarui.setText("PERBARUI");
+        btn_perbarui.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_perbaruiActionPerformed(evt);
+            }
+        });
 
         btn_batal.setText("BATAL");
+        btn_batal.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_batalActionPerformed(evt);
+            }
+        });
 
         btn_hapus.setText("HAPUS");
+        btn_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btn_hapusActionPerformed(evt);
+            }
+        });
 
-        jTextField1.setText("Pencarian");
+        t_cari.setText("Pencarian");
+        t_cari.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                t_cariMouseClicked(evt);
+            }
+        });
+        t_cari.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                t_cariKeyTyped(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -192,7 +222,7 @@ public class FormKehadiran extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 100, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(t_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 223, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -207,7 +237,7 @@ public class FormKehadiran extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(0, 18, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(t_cari, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -351,6 +381,143 @@ public class FormKehadiran extends javax.swing.JFrame {
    
     }//GEN-LAST:event_t_tanggalPropertyChange
 
+    private void t_cariKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_t_cariKeyTyped
+        DefaultTableModel model = (DefaultTableModel) tbl_data.getModel();
+        model.setRowCount(0);
+        
+        String cari = t_cari.getText();
+        
+        try {
+            String sql = "SELECT * FROM kehadiran WHERE id_mahasiswa LIKE ? OR id_ruang LIKE ? OR tanggal LIKE ? OR jam LIKE ? OR status LIKE ?";
+            PreparedStatement st = conn.prepareStatement(sql);
+                st.setString(1, "%" + cari + "%");
+                st.setString(2, "%" + cari + "%");
+                st.setString(3, "%" + cari + "%");
+                st.setString(4, "%" + cari + "%");
+                st.setString(5, "%" + cari + "%");
+            ResultSet rs = st.executeQuery();
+            
+            while (rs.next()){
+                int id = rs.getInt("id");
+                String id_mahasiswa = rs.getString("id_mahasiswa");
+                String id_ruang = rs.getString("id_ruang");
+                String tanggal = rs.getString("tanggal");
+                String jam = rs.getString("jam");
+                String status = rs.getString("status");
+                
+                Object [] rowData = {id,id_mahasiswa,id_ruang,tanggal,jam,status};
+                model.addRow(rowData);
+            }
+            rs.close();
+            st.close();
+        }catch (Exception e){
+             Logger.getLogger(FormMahasiswa.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_t_cariKeyTyped
+
+    private void t_cariMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_t_cariMouseClicked
+         t_cari.setText("");
+    }//GEN-LAST:event_t_cariMouseClicked
+
+    private void btn_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_hapusActionPerformed
+        int selectedRow = tbl_data.getSelectedRow();
+        if (selectedRow == -1){
+        JOptionPane.showMessageDialog(this, "Pilih item yang akan dihapus");
+            return;    
+        }
+        int confirm = JOptionPane.showConfirmDialog(this, "Apakah anda yakin ingin menghapus data ini?", "Konfirmasi", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION){
+            String id = tbl_data.getValueAt(selectedRow, 0).toString();
+            
+            try {
+                String sql = "DELETE FROM kehadiran WHERE id=?";
+                PreparedStatement st = conn.prepareStatement(sql);
+                st.setString(1, id);
+                
+                int rowDelete = st.executeUpdate();
+                if (rowDelete > 0){
+                    JOptionPane.showMessageDialog(this, "Data berhasil dihapus");
+                resetForm();
+                getData();
+                
+                }
+                st.close();
+                }catch (Exception e){
+                Logger.getLogger(FormMahasiswa.class.getName()).log(Level.SEVERE, null, e);
+            }
+        }
+        resetForm();
+        getData();
+        aktifButton();
+        nonAktifButton();
+    }//GEN-LAST:event_btn_hapusActionPerformed
+
+    private void btn_batalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_batalActionPerformed
+        resetForm();
+        aktifButton();
+        nonAktifButton();
+    }//GEN-LAST:event_btn_batalActionPerformed
+
+    private void btn_perbaruiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btn_perbaruiActionPerformed
+        int selectedRow = tbl_data.getSelectedRow();
+        if (selectedRow == -1){
+            JOptionPane.showMessageDialog(this, "Pilih Baris Yang Akan Diperbaharui");
+            return;
+        }
+            String id = tbl_data.getValueAt(selectedRow, 0).toString();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            String date = dateFormat.format(t_tanggal.getDate());
+            String jam = t_jam.getText();
+            String status = t_status.getSelectedItem().toString();
+            
+            if (date.isEmpty() || jam.isEmpty() || status.isEmpty() || t_id_mahasiswa.getSelectedItem().toString().equals("Pilih Nama") || t_id_ruang.getSelectedItem().toString().equals("Pilih Ruang")) {
+            JOptionPane.showMessageDialog(this, "Semua Kolom Harus Diisi!", "Validasi", JOptionPane.ERROR_MESSAGE);
+            return;
+            }
+            try {
+                String sql = "UPDATE kehadiran SET id_mahasiswa=?, id_ruang=?, tanggal=?, jam=?, status=? WHERE id=?";
+                PreparedStatement st = conn.prepareStatement(sql);
+                st.setString(1, t_id_mahasiswa.getSelectedItem().toString());
+                st.setString(2, t_id_ruang.getSelectedItem().toString());
+                st.setString(3, date);
+                st.setString(4, jam);
+                st.setString(5, status);
+                st.setString(6, id);
+            
+                int rowUpdated = st.executeUpdate();
+                if (rowUpdated > 0){
+                    JOptionPane.showMessageDialog(this, "Data Berhasil Diperbaharui");
+                    resetForm();
+                    getData();
+                
+                }
+                st.close();
+                }catch (Exception e){
+                Logger.getLogger(FormKehadiran.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }//GEN-LAST:event_btn_perbaruiActionPerformed
+
+    private void tbl_dataMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tbl_dataMouseClicked
+        int selectedRow = tbl_data.getSelectedRow();
+        if (selectedRow != -1){
+            String idMahasiswa = tbl_data.getValueAt(selectedRow, 1).toString();
+            String idRuang = tbl_data.getValueAt(selectedRow, 2).toString();
+            String tanggal = tbl_data.getValueAt(selectedRow, 3).toString();
+            String jam = tbl_data.getValueAt(selectedRow, 4).toString();
+            String status = tbl_data.getValueAt(selectedRow, 5).toString();
+            
+            t_id_mahasiswa.setSelectedItem(idMahasiswa);
+            t_id_ruang.setSelectedItem(idRuang);
+            Date Date = null;
+            t_tanggal.setDate(Date);
+            t_jam.setText(jam);
+            t_status.setSelectedItem(status);
+        }
+        btn_perbarui.setEnabled(true);
+        btn_tambah.setEnabled(false);
+        btn_hapus.setEnabled(true);
+    }//GEN-LAST:event_tbl_dataMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -399,7 +566,7 @@ public class FormKehadiran extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel6;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField t_cari;
     private javax.swing.JComboBox<String> t_id_mahasiswa;
     private javax.swing.JComboBox<String> t_id_ruang;
     private javax.swing.JTextField t_jam;
@@ -409,6 +576,8 @@ public class FormKehadiran extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
      private void resetForm() {
+        Date Date = null;
+        t_tanggal.setDate(Date);
         t_jam.setText("");
         t_status.setSelectedItem("");
     }
